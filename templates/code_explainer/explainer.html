@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="glass-card">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-code text-primary" aria-hidden="true"></i>
+                    AI Code Analyzer
+                </h1>
+                
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    <strong>Token Cost:</strong> 40 tokens per analysis
+                    <br>
+                    <small>Explain, Debug, Optimize, Document, or Convert your code</small>
+                </div>
+                
+                <form method="post" id="codeForm" aria-label="Code analysis form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <!-- ✅ FIX: Add proper label for select -->
+                            <label for="languageSelect" class="form-label">Programming Language</label>
+                            <select name="language" id="languageSelect" class="form-select" aria-describedby="languageHelp">
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                                <option value="csharp">C#</option>
+                                <option value="php">PHP</option>
+                                <option value="ruby">Ruby</option>
+                                <option value="go">Go</option>
+                                <option value="html">HTML</option>
+                                <option value="css">CSS</option>
+                                <option value="sql">SQL</option>
+                            </select>
+                            <div id="languageHelp" class="form-text">Select the programming language of your code</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <!-- ✅ FIX: Add proper label for select -->
+                            <label for="analysisType" class="form-label">Analysis Type</label>
+                            <select name="analysis_type" id="analysisType" class="form-select" aria-describedby="analysisHelp">
+                                <option value="explain">📖 Explain Code</option>
+                                <option value="debug">🐛 Debug Code</option>
+                                <option value="optimize">⚡ Optimize Code</option>
+                                <option value="document">📝 Add Documentation</option>
+                                <option value="convert">🔄 Convert Language</option>
+                            </select>
+                            <div id="analysisHelp" class="form-text">Choose what you want to do with your code</div>
+                        </div>
+                    </div>
+                    
+                    <!-- ✅ FIX: Target language field - hidden by default -->
+                    <div class="row mb-3 hidden-element" id="targetLanguageDiv">
+                        <div class="col-12">
+                            <label for="targetLanguage" class="form-label">Convert To</label>
+                            <select name="target_language" id="targetLanguage" class="form-select">
+                                <option value="python">Python</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="java">Java</option>
+                                <option value="cpp">C++</option>
+                                <option value="csharp">C#</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <!-- ✅ FIX: Add proper label for textarea -->
+                        <label for="codeTextarea" class="form-label">Your Code</label>
+                        <textarea name="code" id="codeTextarea" class="form-control font-monospace" rows="12" 
+                                  placeholder="Paste your code here..." required
+                                  aria-describedby="codeHelp"></textarea>
+                        <div id="codeHelp" class="form-text">Paste the code you want to analyze</div>
+                    </div>
+                    
+                    <!-- ✅ FIX: Add aria-label for button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-gradient btn-lg" aria-label="Analyze code">
+                            <i class="fas fa-magic" aria-hidden="true"></i> Analyze Code
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <h6 id="tokenBalanceLabel">Your Token Balance</h6>
+                    <span class="badge bg-primary" aria-labelledby="tokenBalanceLabel">
+                        <i class="fas fa-coins" aria-hidden="true"></i> {{ user.token_balance }} tokens
+                    </span>
+                    <div class="mt-2">
+                        <a href="{% url 'buy_tokens' %}" class="btn btn-sm btn-success" aria-label="Buy more tokens">
+                            <i class="fas fa-coins" aria-hidden="true"></i> Buy More Tokens
+                        </a>
+                        <a href="{% url 'my_analyses' %}" class="btn btn-sm btn-info" aria-label="View my analyses history">
+                            <i class="fas fa-history" aria-hidden="true"></i> My Analyses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const analysisType = document.getElementById('analysisType');
+        const targetDiv = document.getElementById('targetLanguageDiv');
+        
+        if (analysisType && targetDiv) {
+            // Initial check
+            targetDiv.style.display = analysisType.value === 'convert' ? 'block' : 'none';
+            
+            // On change event
+            analysisType.addEventListener('change', function() {
+                targetDiv.style.display = this.value === 'convert' ? 'block' : 'none';
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <div class="glass-card">
+                <h1 class="display-4 fw-bold">Welcome to <span class="text-primary">AIForge</span></h1>
+                <p class="lead">Your Complete AI-Powered Content Creation Suite</p>
+                <p class="mb-4">Generate blogs, images, optimize resumes, and explain code using Google's Gemini AI. Get 1000 tokens free on signup!</p>
+                
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-gradient btn-lg">
+                        <i class="fas fa-rocket"></i> Start Creating Free
+                    </a>
+                    <a href="{% url 'pricing' %}" class="btn btn-outline-primary btn-lg ms-2">
+                        <i class="fas fa-tag"></i> View Pricing
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995" alt="AI" class="img-fluid rounded-3 shadow">
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <h2 class="text-center text-white mb-4">Powerful AI Features</h2>
+        
+        <div class="col-md-3 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-pen-fancy"></i>
+                </div>
+                <h3>AI Blog Writer</h3>
+                <p>Generate SEO-optimized blog posts in seconds. Choose tone, length, and style.</p>
+                <span class="badge bg-primary">50 tokens</span>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>AI Image Generator</h3>
+                <p>Create stunning images from text descriptions. Multiple styles available.</p>
+                <span class="badge bg-primary">100 tokens</span>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>Resume Optimizer</h3>
+                <p>ATS-friendly resume optimization with job description targeting.</p>
+                <span class="badge bg-primary">30 tokens</span>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Code Explainer</h3>
+                <p>Understand complex code with line-by-line explanations and debugging.</p>
+                <span class="badge bg-primary">40 tokens</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

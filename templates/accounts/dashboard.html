@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>Welcome back, {{ user.username }}! 👋</h2>
+                        <p class="mb-0">Your AI creativity hub</p>
+                    </div>
+                    <div class="text-end">
+                        <h3 class="token-badge">
+                            <i class="fas fa-coins"></i> {{ user.token_balance }} Tokens
+                        </h3>
+                        <a href="{% url 'buy_tokens' %}" class="btn btn-sm btn-success mt-2">
+                            <i class="fas fa-plus-circle"></i> Buy Tokens
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="glass-card">
+                <h4>Quick Actions</h4>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'blog_writer' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-pen-fancy fa-2x"></i><br>
+                            Write Blog
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'image_generator' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-palette fa-2x"></i><br>
+                            Generate Image
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'resume_optimizer' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-file-alt fa-2x"></i><br>
+                            Optimize Resume
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'code_explainer' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-code fa-2x"></i><br>
+                            Explain Code
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card mt-4">
+                <h4>Recent Activity</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Tokens</th>
+                                <th>Balance</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_activity %}
+                            <tr>
+                                <td>{{ transaction.get_service_type_display }}</td>
+                                <td class="{% if transaction.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+                                    {{ transaction.amount }}
+                                </td>
+                                <td>{{ transaction.balance_after }}</td>
+                                <td>{{ transaction.created_at|timesince }} ago</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No activity yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="glass-card">
+                <h4>Usage Statistics</h4>
+                <canvas id="usageChart"></canvas>
+                
+                <hr>
+                
+                <div class="mt-3">
+                    <h6>Total Tokens Used</h6>
+                    <h3 class="text-danger">{{ total_tokens_used }}</h3>
+                    
+                    <h6 class="mt-3">Service Breakdown</h6>
+                    {% for stat in service_stats %}
+                    <div class="d-flex justify-content-between">
+                        <span>{{ stat.get_service_type_display }}</span>
+                        <span class="badge bg-info">{{ stat.count }} uses</span>
+                        <span class="badge bg-warning">{{ stat.tokens|slice:"1:" }} tokens</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('usageChart').getContext('2d');
+        
+        const labels = [];
+        const data = [];
+        
+        {% for stat in service_stats %}
+            labels.push('{{ stat.get_service_type_display }}');
+            data.push(Math.abs({{ stat.tokens }}));
+        {% endfor %}
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        '#4a90e2',
+                        '#6c5ce7',
+                        '#00b894',
+                        '#fdcb6e',
+                        '#e17055'
+                    ]
+                }]
+            }
+        });
+    });
+</script>
+{% endblock %}

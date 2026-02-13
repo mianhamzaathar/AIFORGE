@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="glass-card">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-code fa-3x text-primary"></i>
+                    </div>
+                    <h1 class="mb-2">AI Code Analyzer</h1>
+                    <p class="text-muted">Powered by Google Gemini AI</p>
+                </div>
+                
+                <!-- Token Info -->
+                <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <i class="fas fa-coins fa-2x me-3"></i>
+                    <div>
+                        <strong>Token Cost:</strong> 40 tokens per analysis<br>
+                        <small>Your balance: <span class="badge bg-primary">{{ user.token_balance }} tokens</span></small>
+                    </div>
+                </div>
+                
+                <!-- Analysis Form -->
+                <form method="post" action="{% url 'analyze_code' %}" class="mt-4">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="language" class="form-label fw-bold">
+                                <i class="fas fa-laptop-code text-primary me-1"></i> Programming Language
+                            </label>
+                            <select name="language" id="language" class="form-select form-select-lg" required>
+                                <option value="" disabled selected>-- Select Language --</option>
+                                <option value="python">🐍 Python</option>
+                                <option value="javascript">📜 JavaScript</option>
+                                <option value="java">☕ Java</option>
+                                <option value="cpp">⚙️ C++</option>
+                                <option value="csharp">🎯 C#</option>
+                                <option value="php">🐘 PHP</option>
+                                <option value="ruby">💎 Ruby</option>
+                                <option value="go">🔵 Go</option>
+                                <option value="rust">🦀 Rust</option>
+                                <option value="html">🌐 HTML</option>
+                                <option value="css">🎨 CSS</option>
+                                <option value="sql">🗄️ SQL</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="analysis_type" class="form-label fw-bold">
+                                <i class="fas fa-magic text-primary me-1"></i> Analysis Type
+                            </label>
+                            <select name="analysis_type" id="analysis_type" class="form-select form-select-lg" required>
+                                <option value="" disabled selected>-- Select Analysis --</option>
+                                <option value="explain">📖 Explain Code</option>
+                                <option value="debug">🐛 Debug Code</option>
+                                <option value="optimize">⚡ Optimize Code</option>
+                                <option value="document">📝 Add Documentation</option>
+                                <option value="convert">🔄 Convert Language</option>
+                                <option value="review">🔍 Code Review</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Target Language (shown only for convert) -->
+                    <div class="row mb-3" id="target_language_row" style="display: none;">
+                        <div class="col-12">
+                            <label for="target_language" class="form-label fw-bold">
+                                <i class="fas fa-exchange-alt text-primary me-1"></i> Convert To
+                            </label>
+                            <select name="target_language" id="target_language" class="form-select form-select-lg">
+                                <option value="" disabled selected>-- Select Target Language --</option>
+                                <option value="python">🐍 Python</option>
+                                <option value="javascript">📜 JavaScript</option>
+                                <option value="java">☕ Java</option>
+                                <option value="cpp">⚙️ C++</option>
+                                <option value="csharp">🎯 C#</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Code Input -->
+                    <div class="mb-3">
+                        <label for="code" class="form-label fw-bold">
+                            <i class="fas fa-file-code text-primary me-1"></i> Your Code
+                        </label>
+                        <textarea name="code" 
+                                  id="code" 
+                                  class="form-control font-monospace" 
+                                  rows="12" 
+                                  placeholder="Paste your code here..."
+                                  required></textarea>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle"></i> 
+                            Supported languages: Python, JavaScript, Java, C++, C#, PHP, Ruby, Go, Rust, HTML, CSS, SQL
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-gradient btn-lg">
+                            <i class="fas fa-magic me-2"></i> Analyze Code
+                            <span class="badge bg-light text-dark ms-2">40 tokens</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Quick Actions -->
+                <hr class="my-4">
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <!-- ✅ FIXED: 'my_analyses' -> 'analysis_history' -->
+                        <a href="{% url 'analysis_history' %}" class="btn btn-outline-info w-100 py-2">
+                            <i class="fas fa-history me-2"></i> My Analysis History
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- ✅ FIXED: 'snippet_list' is correct -->
+                        <a href="{% url 'snippet_list' %}" class="btn btn-outline-success w-100 py-2">
+                            <i class="fas fa-code-branch me-2"></i> My Code Snippets
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Token Purchase Link -->
+                <div class="text-center mt-4">
+                    <p class="mb-1">Need more tokens?</p>
+                    <a href="{% url 'buy_tokens' %}" class="btn btn-warning">
+                        <i class="fas fa-coins me-2"></i> Buy Tokens
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for dynamic form -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const analysisType = document.getElementById('analysis_type');
+        const targetRow = document.getElementById('target_language_row');
+        
+        if (analysisType && targetRow) {
+            analysisType.addEventListener('change', function() {
+                targetRow.style.display = this.value === 'convert' ? 'block' : 'none';
+                const targetLang = document.getElementById('target_language');
+                if (targetLang) {
+                    targetLang.required = this.value === 'convert';
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Custom Styles -->
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        padding: 40px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .btn-gradient {
+        background: linear-gradient(45deg, #4a90e2, #6c5ce7);
+        color: white;
+        border: none;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(74,144,226,0.4);
+        color: white;
+    }
+    
+    .form-select-lg, .form-control-lg {
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .form-select-lg:focus, .form-control-lg:focus {
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 0.2rem rgba(74,144,226,0.25);
+    }
+    
+    @media (max-width: 768px) {
+        .glass-card {
+            padding: 30px 20px;
+        }
+    }
+</style>
+{% endblock %}
